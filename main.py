@@ -1,7 +1,9 @@
 import requests
 import csv
+import psycopg
 
 url = "https://economia.awesomeapi.com.br/last/USD-BRL"
+conn = psycopg.connect("dbname=postgres user=postgres password=senha host=localhost port=5432")
 
 try:
     resposta = requests.get(url)
