@@ -1,9 +1,47 @@
 import requests
 import csv
 import psycopg
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+
+db_name = os.getenv("DB_NAME")
+db_user = os.getenv("DB_USER")
+db_password = os.getenv("DB_PASSWORD")
+db_host = os.getenv("DB_HOST")
+db_port = os.getenv("DB_PORT")
+
 
 url = "https://economia.awesomeapi.com.br/last/USD-BRL"
-conn = psycopg.connect("dbname=postgres user=postgres password=senha host=localhost port=5432")
+
+conn = psycopg.connect(
+    dbname = db_name,
+    user=db_user,
+    password=db_password,
+    host=db_host,
+    port=db_port
+)
+
+
+
+cur = conn.cursor()
+
+cur.execute("SELECT 1 + 1;")
+
+cur.execute("""
+    CREATE TABLE IF NOT EXISTS cotacoes (
+        id SERIAL PRIMARY KEY,
+        moeda TEXT NOT NULL,
+        valor NUMERIC(10, 4) NOT NULL,
+        data_hora TIMESTAMP NOT NULL
+    );
+""")
+
+conn.commit()
+
+
 
 try:
     resposta = requests.get(url)
@@ -12,8 +50,15 @@ try:
         dados = resposta.json()
         cotacao = dados['USDBRL']
         print(f"Data: {cotacao['create_date']} | Valor do dólar: {cotacao['bid']}")
+        cur.execute(
+            "INSERT INTO cotacoes (moeda, valor, data_hora) VALUES (%s, %s, %s)",
+            ("USD-BRL",float(cotacao['bid']), cotacao['create_date'])
+        )
 
-        with open('data/requisicoes.csv','w',newline='',encoding='utf-8-sig') as csvfile:
+        conn.commit()
+        print("Cotação gravada com sucesso!")
+
+        with open('data/requisicoes.csv','a',newline='',encoding='utf-8-sig') as csvfile:
             delimitacao = csv.writer(csvfile, delimiter=' ',
                                     quotechar='|', quoting=csv.QUOTE_ALL)
             delimitacao.writerow(['Cotação:'] + [cotacao['bid']] + ['Data: '] + [cotacao['create_date']])
@@ -24,3 +69,9 @@ try:
 
 except requests.exceptions.RequestException as E:
     print(f"Erro ao falar com a API {E}")
+
+
+
+finally:
+    cur.close()
+    conn.close()
