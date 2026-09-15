@@ -64,6 +64,7 @@ def salvar_no_banco(cotacoes, data_extracao):
                 )
 
         # Confirma a transação
+        print("[INFO] [DB] 3 registros inseridos com sucesso na tabela 'cotacoes'.")
         conn.commit()
 
 def salvar_no_csv(cotacoes, data_extracao):
@@ -77,7 +78,8 @@ def salvar_no_csv(cotacoes, data_extracao):
                     escrever.writerow(["moeda","valor","data_hora", "data_extracao"])
               for moeda, valor, data_hora in cotacoes:
                     escrever.writerow([moeda, valor, data_hora, data_extracao])
-                    print(f"Sucesso: {moeda, valor, data_hora, data_extracao}")
+                    print(f"[INFO] [API] Cotação {moeda} obtida com sucesso: Valor: {valor} Data de estração: {data_extracao}")
+    print("[INFO] [CSV] Dados anexados com sucesso em 'data/requisicoes.csv'.")
                 
 
 
@@ -85,25 +87,28 @@ def main():
     data_extracao = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     cotacoes = extrair_cotacoes()
     if cotacoes:
+          print("[INFO] [DB] Salvando no banco...")
           salvar_no_banco(cotacoes, data_extracao)
+          time.sleep(2)
+          print("[INFO] [CSV] Salvando no CSV")
           salvar_no_csv(cotacoes, data_extracao)
     else:
           print("Nenhuma cotação foi extraída.")
 
 if __name__ == "__main__":
-      print("Coletor Iniciado em segundo plano.")
-
+      print("[INFO] [INIT] Coletor iniciado. Intervalo de execução: 15 minutos.")
       while True:
+            print("[INFO] [START] Iniciando ciclo de extração das cotações...")
             try:
                 main()
-                print("Coleta realizada com Sucesso!")
+                print("[INFO] [DONE] Ciclo concluído com sucesso.")
             except Exception as e:
                   print(f"Ocorreu um erro na requisição: {e}")
-            print("Faltam 15 minutos para a próxima requisição.")
+            print("Olá Danilo, Faltam 15 minutos para a próxima requisição.")
             time.sleep(5 * 60)
-            print("Faltam 10 minutos para a próxima requisição.")
+            print("Olá Danilo, Faltam 10 minutos para a próxima requisição.")
             time.sleep(5 * 60)
-            print("Faltam 5 minutos para a próxima requisição.")
+            print("Olá Danilo, Faltam 5 minutos para a próxima requisição.")
             time.sleep(5 * 60)
 
 
