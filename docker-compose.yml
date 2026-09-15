@@ -9,6 +9,17 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     volumes:
-      - pgdata:/var/lib/postgresql
+      - pgdata:/var/lib/postgresql/data
+  app:
+    build: .
+    container_name: api-fetcher-app
+    depends_on:
+      - postgres-db
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=postgres-db
+    volumes:
+      - ./data:/app/data
 volumes:
   pgdata:
