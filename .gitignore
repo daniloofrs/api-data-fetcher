@@ -1,5 +1,6 @@
 .vscode/
 venv/
 .env
-data/
-__pychace__/
+data/*.csv
+__pycache__/
+*.pyc

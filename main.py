@@ -4,7 +4,8 @@ import psycopg
 from dotenv import load_dotenv
 import os
 from pathlib import Path
-
+import time
+from datetime import datetime
 
 def extrair_cotacoes():
     url = "https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,BTC-BRL"
@@ -26,13 +27,8 @@ def extrair_cotacoes():
          print(f"Erro na requisição: {e}")
     return cotacoes
 
-def salvar_no_banco(cotacoes):
-
-
-
-    load_dotenv() #Pega as chaves do .env
-
-
+def salvar_no_banco(cotacoes, data_extracao):
+    load_dotenv()
 
     db_name = os.getenv("DB_NAME")
     db_user = os.getenv("DB_USER")
@@ -40,46 +36,37 @@ def salvar_no_banco(cotacoes):
     db_host = os.getenv("DB_HOST")
     db_port = os.getenv("DB_PORT")
 
-    # Atribui valores as chaves que eu peguei.
-
-
-    conn = psycopg.connect(
-        dbname = db_name,
+    with psycopg.connect(
+        dbname=db_name,
         user=db_user,
         password=db_password,
         host=db_host,
         port=db_port
-    )
-    #Conecta com o postgres
+    ) as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS cotacoes (
+                    id SERIAL PRIMARY KEY,
+                    moeda TEXT NOT NULL,
+                    valor NUMERIC(16, 4) NOT NULL,
+                    data_hora TIMESTAMP NOT NULL,
+                    data_extracao TIMESTAMP NOT NULL
+                ); 
+            """)
 
-    cur = conn.cursor() #Envia o comando.
-    cur.execute("SELECT 1 + 1;")
+            for moeda, valor, data_hora in cotacoes:
+                cur.execute(
+                    """
+                    INSERT INTO cotacoes (moeda, valor, data_hora, data_extracao)
+                    VALUES (%s, %s, %s, %s);
+                    """,
+                    (moeda, valor, data_hora, data_extracao)
+                )
 
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS cotacoes (
-            id SERIAL PRIMARY KEY,
-            moeda TEXT NOT NULL,
-            valor NUMERIC(16, 4) NOT NULL,
-            data_hora TIMESTAMP NOT NULL
-        ); 
-    """)
-    conn.commit() #Comita o que eu executo.
+        # Confirma a transação
+        conn.commit()
 
-
-    for moeda, valor, data_hora in cotacoes:
-          cur.execute(
-                "INSERT INTO cotacoes (moeda, valor, data_hora) VALUES (%s, %s, %s)",
-                (moeda, valor, data_hora)
-                
-          )
-    conn.commit()
-
-
-
-    cur.close()
-    conn.close()
-
-def salvar_no_csv(cotacoes):
+def salvar_no_csv(cotacoes, data_extracao):
     caminho = Path("data/requisicoes.csv")
     caminho.parent.mkdir(parents=True,exist_ok=True)
     arquivo_novo = not caminho.exists() or caminho.stat().st_size == 0
@@ -87,21 +74,37 @@ def salvar_no_csv(cotacoes):
               escrever = csv.writer(f)
 
               if arquivo_novo:
-                    escrever.writerow(["moeda","valor","data_hora"])
+                    escrever.writerow(["moeda","valor","data_hora", "data_extracao"])
               for moeda, valor, data_hora in cotacoes:
-                    escrever.writerow([moeda, valor, data_hora])
-                    print(f"Sucesso: {moeda, valor, data_hora}")
+                    escrever.writerow([moeda, valor, data_hora, data_extracao])
+                    print(f"Sucesso: {moeda, valor, data_hora, data_extracao}")
                 
 
 
 def main():
+    data_extracao = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     cotacoes = extrair_cotacoes()
     if cotacoes:
-          salvar_no_banco(cotacoes)
-          salvar_no_csv(cotacoes)
+          salvar_no_banco(cotacoes, data_extracao)
+          salvar_no_csv(cotacoes, data_extracao)
     else:
           print("Nenhuma cotação foi extraída.")
 
 if __name__ == "__main__":
-      main()
+      print("Coletor Iniciado em segundo plano.")
+
+      while True:
+            try:
+                main()
+                print("Coleta realizada com Sucesso!")
+            except Exception as e:
+                  print(f"Ocorreu um erro na requisição: {e}")
+            print("Faltam 15 minutos para a próxima requisição.")
+            time.sleep(5 * 60)
+            print("Faltam 10 minutos para a próxima requisição.")
+            time.sleep(5 * 60)
+            print("Faltam 5 minutos para a próxima requisição.")
+            time.sleep(5 * 60)
+
+
       
