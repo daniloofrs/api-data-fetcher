@@ -3,6 +3,7 @@ import csv
 import psycopg
 from dotenv import load_dotenv
 import os
+from pathlib import Path
 
 
 def extrair_cotacoes():
@@ -25,14 +26,12 @@ def extrair_cotacoes():
          print(f"Erro na requisição: {e}")
     return cotacoes
 
-cotacao = extrair_cotacoes()
-for moeda,valor, data_hora in cotacao:
-      print(moeda,valor,data_hora)
-
-
 def salvar_no_banco(cotacoes):
-    load_dotenv()
-    cur = conn.cursor()
+
+
+
+    load_dotenv() #Pega as chaves do .env
+
 
 
     db_name = os.getenv("DB_NAME")
@@ -41,6 +40,9 @@ def salvar_no_banco(cotacoes):
     db_host = os.getenv("DB_HOST")
     db_port = os.getenv("DB_PORT")
 
+    # Atribui valores as chaves que eu peguei.
+
+
     conn = psycopg.connect(
         dbname = db_name,
         user=db_user,
@@ -48,21 +50,58 @@ def salvar_no_banco(cotacoes):
         host=db_host,
         port=db_port
     )
+    #Conecta com o postgres
 
+    cur = conn.cursor() #Envia o comando.
     cur.execute("SELECT 1 + 1;")
 
     cur.execute("""
         CREATE TABLE IF NOT EXISTS cotacoes (
             id SERIAL PRIMARY KEY,
             moeda TEXT NOT NULL,
-            valor NUMERIC(10, 4) NOT NULL,
+            valor NUMERIC(16, 4) NOT NULL,
             data_hora TIMESTAMP NOT NULL
-        );
+        ); 
     """)
+    conn.commit() #Comita o que eu executo.
 
+
+    for moeda, valor, data_hora in cotacoes:
+          cur.execute(
+                "INSERT INTO cotacoes (moeda, valor, data_hora) VALUES (%s, %s, %s)",
+                (moeda, valor, data_hora)
+                
+          )
     conn.commit()
+
+
+
     cur.close()
     conn.close()
 
-      
+def salvar_no_csv(cotacoes):
+    caminho = Path("data/requisicoes.csv")
+    caminho.parent.mkdir(parents=True,exist_ok=True)
+    arquivo_novo = not caminho.exists() or caminho.stat().st_size == 0
+    with open(caminho, mode='a', newline='', encoding="utf-8") as f:
+              escrever = csv.writer(f)
 
+              if arquivo_novo:
+                    escrever.writerow(["moeda","valor","data_hora"])
+              for moeda, valor, data_hora in cotacoes:
+                    escrever.writerow([moeda, valor, data_hora])
+                    print(f"Sucesso: {moeda, valor, data_hora}")
+                
+
+
+def main():
+    cotacoes = extrair_cotacoes()
+    if cotacoes:
+          salvar_no_banco(cotacoes)
+          salvar_no_csv(cotacoes)
+    else:
+          print("Nenhuma cotação foi extraída.")
+
+if __name__ == "__main__":
+      main()
+      
