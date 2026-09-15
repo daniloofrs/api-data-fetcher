@@ -1,55 +1,35 @@
-# API Data Fetcher — Cotação USD-BRL
+# API Data Fetcher 🚀
 
-Script em Python que consulta a cotação atual do dólar (USD-BRL) via API pública e salva o resultado em um arquivo CSV local.
+Pipeline automatizado para extração, processamento e armazenamento de dados de câmbio de moedas (USD-BRL) em tempo real, utilizando Python, PostgreSQL e Docker.
 
-## O que o script faz
+---
 
-1. Faz uma requisição GET para a AwesomeAPI (`economia.awesomeapi.com.br`), buscando a cotação USD-BRL.
-2. Trata falhas de conexão (sem internet, API fora do ar, timeout) sem deixar o programa quebrar sem explicação.
-3. Trata respostas de erro da API (status code diferente de 200).
-4. Se a requisição for bem-sucedida, exibe a data e o valor da cotação no terminal.
-5. Salva a cotação (valor + data) em `data/requisicoes.csv`.
+## 🛠️ Tecnologias Utilizadas
 
-## Tecnologias
+- **Linguagem:** Python 3.11+
+- **Bibliotecas:** `requests`, `psycopg` (v3), `python-dotenv`
+- **Banco de Dados:** PostgreSQL
+- **Containerização:** Docker e Docker Compose
+- **API Externa:** [AwesomeAPI - Cotações de Moedas](https://docs.awesomeapi.com.br/api-de-moedas)
 
-- Python 3
-- [requests](https://pypi.org/project/requests/) — chamadas HTTP
-- `csv` (biblioteca padrão do Python) — escrita do arquivo de saída
+---
 
-## API utilizada
+## 📋 Arquitetura e Funcionamento
 
-[AwesomeAPI — Economia](https://economia.awesomeapi.com.br/last/USD-BRL) — API pública gratuita de cotações, sem necessidade de chave de autenticação.
+1. O script consome os dados mais recentes da cotação USD-BRL via API REST.
+2. Faz o parsing dos dados (taxa de compra e data/hora).
+3. Salva uma cópia local estruturada em arquivo CSV na pasta `/data`.
+4. Persiste os registros em uma tabela relacional (`cotacoes`) dentro do container PostgreSQL com persistência via volumes.
 
-## Como rodar
+---
 
-1. Clone o repositório e entre na pasta do projeto.
-2. Crie e ative um ambiente virtual:
-   ```
-   python3 -m venv venv
-   source venv/bin/activate      # Linux/Mac
-   venv\Scripts\activate         # Windows
-   ```
-3. Instale as dependências:
-   ```
-   pip install -r requirements.txt
-   ```
-4. Execute o script:
-   ```
-   python main.py
-   ```
-5. O resultado aparece no terminal e é salvo em `data/requisicoes.csv`.
+## 🚀 Como Executar o Projeto
 
-## Estrutura do projeto
+### Pré-requisitos
+- [Docker](https://www.docker.com/) e [Docker Compose](https://docs.docker.com/compose/) instalados.
+- [Git](https://git-scm.com/) instalado.
 
-```
-api-data-fetcher/
-├── data/
-│   └── requisicoes.csv
-├── main.py
-├── requirements.txt
-└── README.md
-```
-
-## Aprendizado
-
-Primeiro projeto do módulo "Learn the Basics" do roadmap de Engenharia de Dados — validação prática de consumo de API, tratamento de exceções, manipulação de arquivos e versionamento com Git.
+### 1. Clonar o repositório
+```bash
+git clone [https://github.com/daniloofrs/api-data-fetcher.git](https://github.com/daniloofrs/api-data-fetcher.git)
+cd api-data-fetcher
