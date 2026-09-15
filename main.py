@@ -115,8 +115,8 @@ if __name__ == "__main__":
                 time.sleep(0.5)
             except Exception as e:
                   print(f"Ocorreu um erro na requisição: {e}")
-            print("\n ---------------------------------------------------")
-            print(f"\n[INFO] Próxima requisição agendada para: {proxima_coleta.strftime('%H:%M')} ")
+            print("\n ---------------------------------------------------\n")
+            print(f"[INFO] Próxima requisição agendada para: {proxima_coleta.strftime('%H:%M')} ")
             time.sleep(1)
 
 
@@ -126,7 +126,7 @@ if __name__ == "__main__":
             time.sleep(60 * 5)
             print(f"[PAUSA] Olá {usuario.capitalize()}, Faltam 5 minutos para a próxima requisição.")
             time.sleep(60 * 4)
-            print(f"[PAUSA] Olá {usuario.capitalize()}, Faltaz 1 minuto para a próxima requisição.")
+            print(f"[PAUSA] Olá {usuario.capitalize()}, Faltam 1 minuto para a próxima requisição.")
             time.sleep(60 * 1)
 
 

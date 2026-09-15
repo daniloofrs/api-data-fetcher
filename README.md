@@ -49,6 +49,8 @@ docker exec -it postgres-db psql -U postgres -d postgres -c "SELECT * FROM cotac
 
 ## 📁 Estrutura de Arquivos
 
+```text
+api-data-fetcher/
 ├── data/                  # Diretório montado via volume com o CSV gerado
 ├── .dockerignore          # Arquivos ignorados pelo build do Docker
 ├── .env.example           # Modelo das variáveis de ambiente
@@ -57,3 +59,4 @@ docker exec -it postgres-db psql -U postgres -d postgres -c "SELECT * FROM cotac
 ├── Dockerfile             # Definição do container da aplicação Python
 ├── main.py                # Script principal do pipeline
 └── requirements.txt       # Dependências do projeto
+```
