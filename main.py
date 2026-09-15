@@ -5,9 +5,11 @@ from dotenv import load_dotenv
 import os
 from pathlib import Path
 import time
-from datetime import datetime
+from datetime import datetime,timedelta
 
-def extrair_cotacoes():
+
+
+def extrair_cotacoes(data_extracao):
     url = "https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,BTC-BRL"
     cotacoes = []
     try:
@@ -19,6 +21,7 @@ def extrair_cotacoes():
                         valor = float(item['bid'])
                         data_hora = item['create_date']
                         cotacoes.append((moeda, valor, data_hora))
+                        print(f"[INFO] [API] Cotação {moeda} obtida com sucesso: Valor: {valor} Data de extração: {data_extracao}")
         else:
                 print(
                     f"Erro na requisição: {resposta.status_code}"
@@ -78,38 +81,53 @@ def salvar_no_csv(cotacoes, data_extracao):
                     escrever.writerow(["moeda","valor","data_hora", "data_extracao"])
               for moeda, valor, data_hora in cotacoes:
                     escrever.writerow([moeda, valor, data_hora, data_extracao])
-                    print(f"[INFO] [API] Cotação {moeda} obtida com sucesso: Valor: {valor} Data de estração: {data_extracao}")
+
     print("[INFO] [CSV] Dados anexados com sucesso em 'data/requisicoes.csv'.")
                 
 
 
 def main():
     data_extracao = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    cotacoes = extrair_cotacoes()
+    cotacoes = extrair_cotacoes(data_extracao)
     if cotacoes:
-          print("[INFO] [DB] Salvando no banco...")
+          print("\n[INFO] [DB] Salvando no banco...")
           salvar_no_banco(cotacoes, data_extracao)
           time.sleep(2)
-          print("[INFO] [CSV] Salvando no CSV")
+          print("[INFO] [CSV] Salvando no CSV...\n")
           salvar_no_csv(cotacoes, data_extracao)
     else:
           print("Nenhuma cotação foi extraída.")
 
 if __name__ == "__main__":
-      print("[INFO] [INIT] Coletor iniciado. Intervalo de execução: 15 minutos.")
+      minutos_espera = 15
+      usuario = 'Danilo'
+
+
+      print(f"USUÁRIO: {usuario.capitalize()}\n[INFO] [INIT] Coletor iniciado. Intervalo de execução: {minutos_espera} minutos.\n")
+      time.sleep(0.5)
       while True:
-            print("[INFO] [START] Iniciando ciclo de extração das cotações...")
+            proxima_coleta = datetime.now() + timedelta(minutes=minutos_espera)
+            print("[INFO] [START] Iniciando ciclo de extração das cotações...\n")
             try:
+                time.sleep(1)
                 main()
                 print("[INFO] [DONE] Ciclo concluído com sucesso.")
+                time.sleep(0.5)
             except Exception as e:
                   print(f"Ocorreu um erro na requisição: {e}")
-            print("Olá Danilo, Faltam 15 minutos para a próxima requisição.")
-            time.sleep(5 * 60)
-            print("Olá Danilo, Faltam 10 minutos para a próxima requisição.")
-            time.sleep(5 * 60)
-            print("Olá Danilo, Faltam 5 minutos para a próxima requisição.")
-            time.sleep(5 * 60)
+            print("\n ---------------------------------------------------")
+            print(f"\n[INFO] Próxima requisição agendada para: {proxima_coleta.strftime('%H:%M')} ")
+            time.sleep(1)
+
+
+            print(f"[PAUSA] Olá {usuario.capitalize()}, Faltam 15 minutos para a próxima requisição.")
+            time.sleep(60 * 5)
+            print(f"[PAUSA] Olá {usuario.capitalize()}, Faltam 10 minutos para a próxima requisição.")
+            time.sleep(60 * 5)
+            print(f"[PAUSA] Olá {usuario.capitalize()}, Faltam 5 minutos para a próxima requisição.")
+            time.sleep(60 * 4)
+            print(f"[PAUSA] Olá {usuario.capitalize()}, Faltaz 1 minuto para a próxima requisição.")
+            time.sleep(60 * 1)
 
 
       
