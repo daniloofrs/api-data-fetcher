@@ -4,6 +4,15 @@ Pipeline automatizado para extração, processamento e armazenamento de dados de
 
 ### 📸 Demonstração e Evidências
 
+<p align="center">
+  <img width="700" alt="Demonstração do pipeline em execução" src="https://github.com/user-attachments/assets/206d890e-96f5-4c5d-bf01-7d061d25d395" />
+</p>
+
+<p align="center">
+  <sub>Pipeline em tempo real: extração de dados via API REST, persistência em PostgreSQL e append incremental no arquivo CSV.</sub>
+</p>
+
+
 ### Execução e Logs
 Registro da extração (USD/EUR/BTC), persistência no banco, gravação em disco e agendamento:
 
