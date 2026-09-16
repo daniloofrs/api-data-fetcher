@@ -1,4 +1,4 @@
-# API Data Fetcher 🚀
+# API Data Fetcher
 
 Pipeline automatizado para extração, processamento e armazenamento de dados de câmbio de moedas (USD-BRL) em tempo real, utilizando Python, PostgreSQL e Docker.
 
