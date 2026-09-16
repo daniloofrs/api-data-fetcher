@@ -2,6 +2,29 @@
 
 Pipeline automatizado para extração, processamento e armazenamento de dados de câmbio de moedas (USD-BRL) em tempo real, utilizando Python, PostgreSQL e Docker.
 
+## 📸 Demonstração e Evidências de Execução
+
+Abaixo estão as evidências do funcionamento contínuo, persistência e isolamento do pipeline.
+
+### 1. Logs da Aplicação em Tempo Real
+Registro da extração das cotações (USD, EUR e BTC), persistência relacional no banco de dados, gravação em disco e gerenciamento dos ciclos de agendamento:
+
+<img width="1110" height="851" alt="codigo" src="https://github.com/user-attachments/assets/43383327-af0a-4f75-a75d-75b3c96ed44a" />
+
+---
+
+### 2. Persistência Incremental em CSV
+Histórico cronológico acumulado no arquivo `data/requisicoes.csv`, demonstrando a ingestão contínua a cada intervalo programado:
+
+<img width="507" height="848" alt="csv" src="https://github.com/user-attachments/assets/b6635d55-7eae-470f-b881-4a80f350696a" />
+
+---
+
+### 3. Orquestração e Ambiente com Docker
+Containers da aplicação e do PostgreSQL operando em segundo plano via Docker Compose com portas e volumes devidamente mapeados:
+
+<img width="811" height="379" alt="docker" src="https://github.com/user-attachments/assets/5b478079-b9a2-4561-a360-34025a15f744" />
+
 ---
 
 ## 🛠️ Tecnologias Utilizadas
