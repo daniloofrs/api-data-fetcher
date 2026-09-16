@@ -7,21 +7,21 @@ Pipeline automatizado para extração, processamento e armazenamento de dados de
 ### Execução e Logs
 Registro da extração (USD/EUR/BTC), persistência no banco, gravação em disco e agendamento:
 
-<img width="300" alt="Logs de Execução e Agendamento do Pipeline" src="https://github.com/user-attachments/assets/43383327-af0a-4f75-a75d-75b3c96ed44a" />
+<img width="400" alt="Logs de Execução e Agendamento do Pipeline" src="https://github.com/user-attachments/assets/43383327-af0a-4f75-a75d-75b3c96ed44a" />
 
 ---
 
 ### Histórico Acumulado no CSV
 Visualização do acúmulo de dados históricos no arquivo `data/requisicoes.csv`:
 
-<img width="300" alt="Histórico Acumulado no Arquivo CSV" src="https://github.com/user-attachments/assets/b6635d55-7eae-470f-b881-4a80f350696a" />
+<img width="400" alt="Histórico Acumulado no Arquivo CSV" src="https://github.com/user-attachments/assets/b6635d55-7eae-470f-b881-4a80f350696a" />
 
 ---
 
 ### Infraestrutura com Docker
 Containers da aplicação e PostgreSQL operando em segundo plano via Docker Compose:
 
-<img width="300" alt="Containers Docker e Docker Compose UP" src="https://github.com/user-attachments/assets/5b478079-b9a2-4561-a360-34025a15f744" />
+<img width="400" alt="Containers Docker e Docker Compose UP" src="https://github.com/user-attachments/assets/5b478079-b9a2-4561-a360-34025a15f744" />
 ---
 
 ## 🛠️ Tecnologias Utilizadas
