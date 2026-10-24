@@ -1,119 +1,116 @@
 # API Data Fetcher
 
-Pipeline automatizado para extração, processamento e armazenamento de dados de câmbio de moedas (USD, EUR e BTC para BRL) em tempo real, utilizando Python, PostgreSQL e Docker.
+Aqui você encontra uma aplicação em Python que consulta as cotações de moedas (USD, EUR e BTC para BRL) a cada 15 minutos e grava o histórico tanto no PostgreSQL quanto num arquivo CSV.
 
-### 📸 Demonstração e Evidências
+### Demonstração
 
 <p align="center">
   <img width="700" alt="Demonstração do pipeline em execução" src="https://github.com/user-attachments/assets/206d890e-96f5-4c5d-bf01-7d061d25d395" />
 </p>
 
 <p align="center">
-  <sub>Pipeline em tempo real: extração de dados via API REST, persistência em PostgreSQL e append incremental no arquivo CSV.</sub>
+  <sub>Fluxo da aplicação: consulta à API, gravação no banco e histórico salvo num CSV local.</sub>
 </p>
 
-
-### Execução e Logs
-Registro da extração (USD/EUR/BTC), persistência no banco, gravação em disco e agendamento:
+### Logs da coleta
+Seu terminal mostra cada requisição feita, a confirmação do banco e uma contagem regressiva até a próxima rodada:
 
 <img width="400" alt="Logs de Execução e Agendamento do Pipeline" src="https://github.com/user-attachments/assets/43383327-af0a-4f75-a75d-75b3c96ed44a" />
 
 ---
 
-### Histórico Acumulado no CSV
-Visualização do acúmulo de dados históricos no arquivo `data/requisicoes.csv`:
+### Histórico acumulado em CSV
+Dá pra ver como os dados vão se acumulando linha a linha no seu arquivo `data/requisicoes.csv`:
 
 <img width="400" alt="Histórico Acumulado no Arquivo CSV" src="https://github.com/user-attachments/assets/b6635d55-7eae-470f-b881-4a80f350696a" />
 
 ---
 
-### Infraestrutura com Docker
-Containers da aplicação e PostgreSQL operando em segundo plano via Docker Compose:
+### Containers em execução
+Aqui você confere os containers da sua aplicação e do PostgreSQL rodando juntos via Docker Compose:
 
 <img width="400" alt="Containers Docker e Docker Compose UP" src="https://github.com/user-attachments/assets/5b478079-b9a2-4561-a360-34025a15f744" />
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## O que usamos aqui
 
-- **Linguagem:** Python 3.12 (compatível com 3.11+)
-- **Bibliotecas:** requests, psycopg (v3), python-dotenv
-- **Banco de Dados:** PostgreSQL
-- **Containerização:** Docker e Docker Compose
-- **API Externa:** AwesomeAPI (Cotações de Moedas: USD, EUR e BTC)
-
----
-
-## 📋 Arquitetura e Funcionamento
-
-1. **Extração de Dados:** O coletor consome a API REST da AwesomeAPI obtendo as cotações mais recentes de **USD-BRL**, **EUR-BRL** e **BTC-BRL**.
-2. **Parsing e Estruturação:** Trata os dados capturando a moeda (`moeda`), taxa de compra (`valor`), horário original da cotação (`data_hora`) e o timestamp da extração (`data_extracao`).
-3. **Persistência Relacional:** Insere os registros na tabela `cotacoes` dentro do banco PostgreSQL (com persistência via volumes Docker).
-4. **Armazenamento em CSV:** Salva os registros em modo incremental (*append*) no arquivo estruturado `/data/requisicoes.csv`.
-5. **Automação Contínua:** O pipeline opera em loop automático, executando novos ciclos de extração a cada **15 minutos**.
+- Python 3.12 (funciona bem a partir do 3.11)
+- PostgreSQL
+- Docker e Docker Compose
+- Bibliotecas: `requests`, `psycopg` (v3) e `python-dotenv`
+- [AwesomeAPI](https://docs.awesomeapi.com.br/) pras cotações em tempo real
 
 ---
 
-## 🚀 Como Executar o Projeto
+## Como funciona por baixo dos panos
 
-### Pré-requisitos
-- Docker e Docker Compose instalados.
-- Git instalado.
+1. O script faz chamadas na AwesomeAPI buscando as cotações atuais de USD-BRL, EUR-BRL e BTC-BRL.
+2. Pega o preço de compra (`valor`), o horário retornado e marca a data exata da sua extração.
+3. Conecta no PostgreSQL e insere tudo na tabela `cotacoes` (seus dados ficam salvos num volume do Docker).
+4. Grava uma cópia incremental no final do seu arquivo `data/requisicoes.csv`.
+5. Fica em pausa no terminal e repete esse ciclo a cada 15 minutos.
 
-### 1. Clonar o repositório
+---
+
+## Como rodar na sua máquina
+
+### O que você precisa antes
+- Docker e Docker Compose instalados no seu computador.
+- Git pra clonar o repositório.
+
+### 1. Clone o repositório
 ```bash
 git clone https://github.com/daniloofrs/api-data-fetcher.git
 cd api-data-fetcher
 ```
 
-### 2. Configurar as variáveis de ambiente
-Crie seu arquivo `.env` com base no `.env.example`:
+### 2. Prepare suas variáveis de ambiente
+Crie o seu `.env` copiando nosso arquivo de exemplo:
 ```bash
 cp .env.example .env
 ```
+Se você quiser alterar a senha, porta ou usuário do seu banco, é só editar esse arquivo antes de subir tudo.
 
-*(Ajuste os valores no `.env` caso queira alterar a senha ou porta do banco)*
-
-### 3. Subir os containers com Docker Compose
+### 3. Suba os containers
 ```bash
 docker compose up -d --build
 ```
 
-### 4. Acompanhar os logs da aplicação
-Para verificar os ciclos e requisições agendadas em tempo real:
+### 4. Veja seus logs em tempo real
+Pra você acompanhar o coletor em ação:
 ```bash
 docker logs -f api-fetcher-app
 ```
 
-### 5. Consultar os dados gravados no PostgreSQL
-Acesse o container do banco para consultar a tabela de cotações:
+### 5. Consulte seus dados no PostgreSQL
+Pra conferir se tá tudo salvo no banco, você pode entrar direto no container do Postgres:
 ```bash
 docker exec -it postgres-db psql -U postgres -d postgres -c "SELECT * FROM cotacoes ORDER BY id DESC LIMIT 10;"
 ```
-*(Nota: caso tenha modificado o `DB_USER` ou `DB_NAME` no `.env`, ajuste os parâmetros `-U` e `-d` de acordo)*
+Caso você tenha trocado o `DB_USER` ou `DB_NAME` no seu `.env`, ajuste os parâmetros `-U` e `-d` pro seu caso.
 
-### 6. Executar análise estatística dos dados
-Para visualizar um resumo estatístico das cotações acumuladas (total de registros, mínima, máxima, média e volatilidade):
+### 6. Rode a análise estatística
+Deixamos um script pronto (`analytics.py`) pra você ver média, mínima, máxima e volatilidade das cotações. Dá pra rodar direto no container:
 
 ```bash
-# Executando dentro do container da aplicação:
 docker exec -it api-fetcher-app python analytics.py
 ```
-*(Ou localmente com Python instalado: `python analytics.py`)*
+Ou rodar na sua máquina com Python local: `python analytics.py`.
 
 ---
 
-## 📁 Estrutura de Arquivos
+## Estrutura do projeto
 
 ```text
 api-data-fetcher/
-├── data/                  # Diretório montado via volume com o CSV gerado
-├── .dockerignore          # Arquivos ignorados pelo build do Docker
-├── .env.example           # Modelo das variáveis de ambiente
-├── .gitignore             # Arquivos ignorados pelo Git (.env, venv, etc.)
-├── analytics.py           # Análise e estatísticas dos dados persistidos
-├── docker-compose.yml     # Orquestração dos containers (App + PostgreSQL)
-├── Dockerfile             # Definição do container da aplicação Python
-├── main.py                # Script principal do pipeline
-└── requirements.txt       # Dependências do projeto
+├── data/                  # CSV gerado pelo pipeline (volume compartilhado)
+├── .dockerignore          # O que não vai pro build do Docker
+├── .env.example           # Modelo pras suas variáveis de ambiente
+├── .gitignore             # Arquivos ignorados pelo Git
+├── analytics.py           # Script pra puxar métricas do seu banco
+├── docker-compose.yml     # Orquestração dos containers
+├── Dockerfile             # Imagem da aplicação Python
+├── main.py                # Script do coletor
+└── requirements.txt       # Dependências Python
 ```
