@@ -1,5 +1,12 @@
 # API Data Fetcher
 
+[![CI](https://github.com/daniloofrs/api-data-fetcher/actions/workflows/ci.yml/badge.svg)](https://github.com/daniloofrs/api-data-fetcher/actions/workflows/ci.yml)
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+
 Aqui você encontra uma aplicação em Python que consulta as cotações de moedas (USD, EUR e BTC para BRL) a cada 15 minutos e grava o histórico tanto no PostgreSQL quanto num arquivo CSV.
 
 ### Demonstração
